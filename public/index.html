@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.png?">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>GDSC Dev Team Recruitments</title>
+</head>
+<body class="bg-gray-100 text-sm">
+<div class="container mx-auto font-mono px-4 py-2 max-w-6xl">
+    <h1 class="text-2xl font-bold mb-2">GDSC SNIoE Dev Team Recruitments</h1>
+    <div class="bg-white shadow-sm rounded p-4">
+        <!-- Previous content remains the same -->
+    </div>
+    <div class="mt-4 bg-white shadow-sm rounded p-4">
+        <h2 class="text-xl font-bold mb-2">Submit Your Task</h2>
+        <form id="submission-form" class="space-y-4">
+            <div>
+                <label for="submission-text" class="block text-sm font-medium text-gray-700">Your Submission</label>
+                <textarea id="submission-text" name="text" rows="4" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"></textarea>
+            </div>
+            <div>
+                <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="mt-4 bg-white shadow-sm rounded p-4">
+        <h2 class="text-xl font-bold mb-2">Recent Submissions</h2>
+        <ul id="submissions-list" class="space-y-2">
+            <!-- Submissions will be dynamically added here -->
+        </ul>
+    </div>
+</div>
+
+<script>
+document.getElementById('submission-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const submission = Object.fromEntries(formData.entries());
+
+    try {
+        const response = await fetch('/api/submissions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(submission),
+        });
+
+        if (response.ok) {
+            alert('Submission successful!');
+            e.target.reset();
+            fetchSubmissions();
+        } else {
+            alert('Submission failed. Please try again.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred. Please try again.');
+    }
+});
+
+async function fetchSubmissions() {
+    try {
+        const response = await fetch('/api/submissions');
+        const submissions = await response.json();
+        const submissionsList = document.getElementById('submissions-list');
+        submissionsList.innerHTML = '';
+        submissions.forEach(submission => {
+            const li = document.createElement('li');
+            li.className = 'bg-gray-50 p-2 rounded';
+            li.textContent = submission.text;
+            submissionsList.appendChild(li);
+        });
+    } catch (error) {
+        console.error('Error fetching submissions:', error);
+    }
+}
+
+fetchSubmissions();
+</script>
+</body>
+</html>
